@@ -10,7 +10,7 @@ st.set_page_config(
     layout="centered"
 )
 
-# --- CSS CUSTOM BIAR GAK POLOS ---
+# --- CSS CUSTOM BIAR GANTENG ---
 st.markdown("""
     <style>
     .main {
@@ -23,14 +23,8 @@ st.markdown("""
         background-color: #007bff;
         color: white;
     }
-    .result-box {
-        padding: 20px;
-        border-radius: 10px;
-        text-align: center;
-        margin-top: 20px;
-    }
     </style>
-    """, unsafe_allow_name_html=True)
+    """, unsafe_allow_html=True)
 
 # --- FUNGSI BYPASS LAYER (ANTI-ERROR) ---
 def fix_layer(cls):
@@ -61,20 +55,18 @@ st.divider()
 try:
     model = load_model()
     
-    # Upload area
     uploaded_file = st.file_uploader("Pilih foto sampah...", type=["jpg", "jpeg", "png"])
 
     if uploaded_file is not None:
-        # Layout kolom: Kiri Foto, Kanan Hasil
         col1, col2 = st.columns([1, 1])
         
         image = Image.open(uploaded_file).convert('RGB')
         
         with col1:
-            st.image(image, caption="Foto yang Kamu Kirim", use_container_width=True)
+            st.image(image, caption="Foto Sampah", use_container_width=True)
         
         with col2:
-            with st.spinner('Sedang Menganalisis...'):
+            with st.spinner('Menganalisis...'):
                 # Preprocessing
                 img_resized = image.resize((224, 224))
                 img_array = np.array(img_resized) / 255.0
@@ -82,31 +74,30 @@ try:
                 
                 # Prediksi
                 prediction = model.predict(img_array)
-                score = prediction[0][0]
+                score = float(prediction[0][0])
                 
-                # Logika Hasil
                 if score > 0.5:
                     label = "ANORGANIK"
                     persen = score * 100
-                    warna = "#ff4b4b" # Merah untuk anorganik
+                    warna = "#ff4b4b"
                     icon = "🥤"
                 else:
                     label = "ORGANIK"
                     persen = (1 - score) * 100
-                    warna = "#28a745" # Hijau untuk organik
+                    warna = "#28a745"
                     icon = "🍎"
 
-                # Box Hasil yang Cantik
+                # Box Hasil
                 st.markdown(f"""
                     <div style="background-color: {warna}; color: white; padding: 20px; border-radius: 10px; text-align: center;">
-                        <h2>{icon} {label}</h2>
-                        <h1 style="margin: 0;">{persen:.1f}%</h1>
-                        <p>Tingkat Keyakinan</p>
+                        <h2 style='color: white;'>{icon} {label}</h2>
+                        <h1 style='color: white; margin: 0;'>{persen:.1f}%</h1>
+                        <p style='color: white;'>Tingkat Keyakinan</p>
                     </div>
-                """, unsafe_allow_name_html=True)
+                """, unsafe_allow_html=True)
 
     else:
-        st.info("Silakan upload foto sampah untuk memulai klasifikasi.")
+        st.info("Silakan upload foto sampah untuk memulai.")
 
 except Exception as e:
     st.error(f"Terjadi kesalahan teknis: {e}")
